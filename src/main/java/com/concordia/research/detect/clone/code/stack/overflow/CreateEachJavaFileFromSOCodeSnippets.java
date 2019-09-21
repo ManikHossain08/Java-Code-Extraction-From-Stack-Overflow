@@ -12,31 +12,60 @@ import java.util.StringTokenizer;
  */
 public class CreateEachJavaFileFromSOCodeSnippets {
 
-	static final String MacOSXPathToWrite = "/Users/manikhossain/EclipseCreatedSOJavaFile/";
-	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/QueryResults copy.csv";
+	static final String MacOSXPathToWriteBlocks = "/Users/manikhossain/EclipseCreatedSOJavaFile/Blocks/";
+	static final String MacOSXPathToWriteFunctions = "/Users/manikhossain/EclipseCreatedSOJavaFile/Functions/";
+	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/Q_2018.csv";
+	static final String MacOSXPathLoggedErroticFile = "/Users/manikhossain/Q_NiCadLogs.csv";
 
-	static String[] codeTokens = { "class", "package", "public", "private", "public static", "private static",
-			"public class", "private boolean", "public void", "private void", "import", "public interface",
-			"private interface", "abstract class", "public boolean", "void" };
+	static String[] codeTokensForFunctions = { "class", "package", "public", "private", "public static",
+			"private static", "public class", "private boolean", "public void", "private void", "import",
+			"public interface", "private interface", "abstract class", "public boolean", "void" };
 	static String[] codeReverseTokens = { "String.class" };
-	static String[] removeUnwantedCode = { "<?xml version", "<application", "apply plugin", "compileSdkVersion",
-			"<fileSets>", "<artifactId>", "<properties>", "pom.xml", "<plugins>", "using namespace std;", "<Switch",
-			"</style>", "org.junit.Test", "Runtime Environment", "fatal error", "<dependency>", "<div>", "<bean",
-			"<!--", "git repo", "java.lang", "</property>", "Caused by:", "internal error occurred", "FATAL EXCEPTION",
-			"ComparisonFailure", "SDK_INT", "Unknown Source", "</mapping>", "mapping error", "error", "hibernate",
-			"failed", "dependencies", "Unexpected", "unexpected", "No active", "ERROR", "html", "module", "</option>",
-			"docker", "vector" };
+	static String[] removeUnwantedCode = { "xml", "<application", "apply plugin", "compileSdkVersion", "<fileSets>",
+			"<artifactId>", "<properties>", "pom.xml", "<plugins>", "using namespace std;", "<Switch", "</style>",
+			"org.junit", "Runtime Environment", "fatal error", "<dependency>", "<div>", "<bean", "<!--", "git repo",
+			"</property>", "Caused by:", "FATAL EXCEPTION", "ComparisonFailure", "Unknown Source", "</mapping>",
+			"hibernate", "dependencies", "Unexpected", "unexpected", "No active", "ERROR", "</html>", "module",
+			"</option>", "docker", "vector", "version:", "src/main", "warning", "<?php", "</project>", "\"data\"",
+			"FAILS", "failed", "fails", "fatal", "xhtml", "404", "</div>", "<form:", "C#", "Button", "print",
+			"statusCode", "</activity>", "etc", "->", "java.lang", "select", "SELECT", "sql", "SQL", "</script>",
+			"<tr>", "<td>", "spring", "error", "TABLE", "table", "<TextView", "<servlet-mapping>", "jar",
+			"Breakpoint","<Label>","VERSION","SDK_INT","using","scala","<script>","html" };
 
 	static String MacOSXFullPathToWrite = "";
 	static String CombineAllCode = "";
 	static boolean isStartwithSlashAndContainsTokens = false;
+	static boolean isBlocks = false;
 	static String postIDAsFileName = "";
 	static String bodyOfCode = "";
+	static int NoOfFileExtracted = 0;
 
 	public static void main(String[] args) throws IOException {
 
 		String filename = MacOSXPathToReadFile;
-		File file = new File(filename);
+		//File file = new File(filename);
+		File directory1 = new File(MacOSXPathToWriteBlocks);
+		File directory2 = new File(MacOSXPathToWriteFunctions);
+	
+		if (!directory1.exists()) {
+			directory1.mkdir();
+		}
+		if (!directory2.exists()) {
+			directory2.mkdir();
+		}
+		
+		
+		File[] files = new File(filename).listFiles();
+		//If this pathname does not denote a directory, then listFiles() returns null. 
+
+		for (File singlefile : files) {
+		    if (singlefile.isFile()) {
+		    	getAllFilesFromCSVFolders(singlefile);
+		    }
+		}
+	}
+
+	private static void getAllFilesFromCSVFolders(File file) throws IOException {
 		try {
 			Scanner sc = new Scanner(file);
 			while (sc.hasNext()) {
@@ -45,9 +74,13 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 				if (!data.toLowerCase().contentEquals("body")) {
 					if (data.startsWith("\"") && !data.contentEquals("\"")) { // indicate starting of each row value
 						data = data.substring(1); // remove first char because at the beginning " this char comes
-						if (data.contains("<postid>")) {
+						if (data.contains("<postid>") && data.split("<postid>").length > 1) {
 							postIDAsFileName = data.split("<postid>")[0];
 							bodyOfCode = data.split("<postid>")[1];
+						} else {
+							postIDAsFileName = "FoundProblemInData";
+							bodyOfCode = "FoundProblemInData";
+							continue;
 						}
 						if (!isStartwithSlashAndContainsTokens) {
 							// add only code not comments with tokens till end
@@ -66,11 +99,11 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 
 			}
 			sc.close();
-			System.out.println("Code Extraction done succesfully.");
+			System.out.println("Code Extraction done succesfully. " + NoOfFileExtracted
+					+ " java files have been extracted from this csv file.");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	// replace garbage code from SO database [here single lines of code will come]
@@ -80,24 +113,31 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		data = data.replace("&lt;", "<");
 		data = data.replace("&gt;", ">");
 		data = data.replace("...", "");
+		data = data.replace("....", "");
+		data = data.replace("..", "");
 		data = data.replace("&amp;&amp;", "&&");
-		if (data.contains("here") || data.contains("java.lang")) {
+		data = data.replace("&amp;", "&"); 
+		data = data.replace("`", "");
+		if (data.contains("here") || data.strip().contentEquals(".") || data.startsWith(".")) {
 			isStartwithSlashAndContainsTokens = true;
 		}
+		if (data.contains("//") && data.split("//").length > 1) {
 
-		if (data.contains("//")) {
-			if (data.split("//").length > 1 || data.startsWith("//")) {
-				String[] splitComments = data.split("//");
-				codeWrangglingFunctionORBlocks(splitComments[1], 0);
-				if (isStartwithSlashAndContainsTokens) {
-					if (!data.startsWith("//"))
-						isStartwithSlashAndContainsTokens = false;
-					data = splitComments[0];
-					
-				}
-				if (splitComments[1].strip().contentEquals("}")) {
-					data = splitComments[1];
-				}
+			if (data.split("//")[1].strip().contains("}")) {
+				data = data.replace("}", "//remove left bracket by manual conding");
+			}
+			if(data.split("//")[1].strip().contains("{")) {
+				data = data.replace("{", "//remove right bracket by manual conding");
+			}
+			String[] splitComments = data.split("//");
+			codeWrangglingFunctionORBlocks(splitComments[1], 0);
+			if (isStartwithSlashAndContainsTokens) {
+				if (!data.startsWith("//"))
+					isStartwithSlashAndContainsTokens = false;
+				data = splitComments[0];
+			}
+			if (data.startsWith(".")) {
+				isStartwithSlashAndContainsTokens = true;
 			}
 		}
 
@@ -111,11 +151,11 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		for (String partByPartCode : splitCOde) {
 			String[] departedCode = partByPartCode.split("</code>");
 			if (departedCode.length > 1) {
-				String contentOfFile = codeWrangglingFunctionORBlocks(departedCode[0], 1);
-				int noOfLines = countLines(contentOfFile);
-				int noOfWords = countWordsUsingStringTokenizer(contentOfFile);
+				int noOfLines = countLines(departedCode[0]);
+				int noOfWords = countWordsUsingStringTokenizer(departedCode[0]);
 				try {
-					if (noOfWords > 3 && noOfLines > 5) {
+					if (noOfWords > 3 && noOfLines > 9) {
+						String contentOfFile = codeWrangglingFunctionORBlocks(departedCode[0], 1);
 						createJavaFileUsingFileClass(fileName + "_" + Integer.toString(counter), contentOfFile);
 						counter += 1;
 					}
@@ -138,7 +178,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		if (ischeckCode == 1)
 			data = removeUnbalancedCurlyBrackets(data);
 
-		for (String matchingToken : codeTokens) {
+		for (String matchingToken : codeTokensForFunctions) {
 			if (data.toString().contains(matchingToken)) {
 				iscontainTokens = true;
 				if (ischeckCode == 0)
@@ -155,6 +195,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 			{
 				data = "{" + "\n" + data + "\n" + "}";
 				iscontainTokens = false;
+				isBlocks = true;
 			}
 		}
 		return data;
@@ -169,31 +210,116 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 					&& fileContent.charAt(fileContent.length() - 1) == '}') {
 				fileContent = fileContent.substring(0, fileContent.length() - 1);
 			} else if (countLeftBrackets > countRightBrackets) {
-				fileContent = fileContent + "}";
+				fileContent = fileContent + "\n"+ "}";
 			}
 		}
+
 		return fileContent;
 	}
 
 	private static void createJavaFileUsingFileClass(String fileName, String allCode) throws IOException {
-		MacOSXFullPathToWrite = MacOSXPathToWrite + fileName + ".java";
-		File file = new File(MacOSXFullPathToWrite);
 		boolean isUnwanted = false;
-		file.delete();
-		for (String removeUnwantedCode1 : removeUnwantedCode) {
-			if (allCode.toString().contains(removeUnwantedCode1)) {
-				isUnwanted = true;
-			}
+		
+		if (isBlocks) {
+			MacOSXFullPathToWrite = MacOSXPathToWriteBlocks + fileName + ".java";
+		} else {
+			MacOSXFullPathToWrite = MacOSXPathToWriteFunctions + fileName + ".java";
+			
 		}
+		File file = new File(MacOSXFullPathToWrite);
+
+		file.delete();
+//		for (String removeUnwantedCode1 : removeUnwantedCode) {
+//			if (allCode.toString().contains(removeUnwantedCode1)) {
+//				isUnwanted = true;
+//				break;
+//			}
+//		}
+		
+//		if(allCode.startsWith("class")) {
+//			isUnwanted = true;
+//		}
+		
+//		if (!isBlocks && !isUnwanted) isUnwanted = IstheFileErrotic(fileName);
+		
+		
 		// Create the file if the code is only in java and not unwanted code
 		if (!isUnwanted) {
+			//if (!isBlocks)CleanMultipleclassInSameFile(allCode, fileName);
+			allCode = removeUnbalancedCurlyBrackets(allCode);
+			allCode = removeUnbalancedCurlyBrackets(allCode);
+			allCode = removeUnbalancedCurlyBrackets(allCode);
+			allCode = removeUnbalancedCurlyBrackets(allCode);
+			allCode = removeUnbalancedCurlyBrackets(allCode);
+
 			file.createNewFile();
 			// Write Content
 			FileWriter writer = new FileWriter(file);
 			writer.write(allCode);
 			writer.close();
+			NoOfFileExtracted += 1;
+			//isBlocks = false;
 		}
+		isBlocks = false;
 
+	}
+
+	private static boolean IstheFileErrotic(String fileName) throws FileNotFoundException {
+		boolean IstheFileErrotic = false;
+		File file = new File(MacOSXPathLoggedErroticFile);
+		Scanner sc2 = new Scanner(file);
+		while (sc2.hasNext()) {
+			String data = sc2.nextLine();
+			if ((!data.contentEquals("") || !data.isEmpty()) && data.contains(fileName)) {
+				IstheFileErrotic = true;
+				System.out.println("gurbageCode Found: " + fileName);
+				break;
+			}
+		}
+		sc2.close();
+		return IstheFileErrotic;
+	}
+
+	private static String CleanMultipleclassInSameFile(String allCode, String fileName) {
+		String gurbageCode = "";
+		if (!allCode.startsWith("package") && allCode.contains("package")) {
+			gurbageCode = allCode.split("package")[0].strip();
+			if (!gurbageCode.isEmpty()) {
+				if (!gurbageCode.contains("package") && !gurbageCode.contains("import") 
+						&& !gurbageCode.startsWith("@")) { 
+					allCode = allCode.replace(gurbageCode, "");
+					System.out.println("public class: " + fileName);
+					System.out.println("gurbageCode: " + gurbageCode);
+					gurbageCode = "";
+				}
+			}
+		}
+		else if (!allCode.startsWith("package") && allCode.contains("package")) {
+			gurbageCode = allCode.split("import")[0].strip();
+			if (!gurbageCode.isEmpty()) {
+				if (!gurbageCode.contains("package") && !gurbageCode.contains("import") 
+						&& !gurbageCode.startsWith("@")) { 
+					allCode = allCode.replace(gurbageCode, "");
+					System.out.println("public class: " + fileName);
+					System.out.println("gurbageCode: " + gurbageCode);
+					gurbageCode = "";
+				}
+			}
+		}else if(!allCode.startsWith("public class") && allCode.contains("public class")) {
+			
+			gurbageCode = allCode.split("public class")[0].strip();
+			if (!gurbageCode.isEmpty()) {
+				if (!gurbageCode.contains("package") && !gurbageCode.contains("import") 
+						&& !gurbageCode.startsWith("@")) { 
+					allCode = allCode.replace(gurbageCode, "");
+					System.out.println("public class: " + fileName);
+					System.out.println("gurbageCode: " + gurbageCode);
+					gurbageCode = "";
+				}
+			}
+			
+		}
+		return allCode;
 	}
 
 	private static int countLines(String str) {
