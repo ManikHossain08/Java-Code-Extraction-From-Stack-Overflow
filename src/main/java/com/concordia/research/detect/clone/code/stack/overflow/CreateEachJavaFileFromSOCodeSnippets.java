@@ -14,8 +14,9 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 
 	static final String MacOSXPathToWriteBlocks = "/Users/manikhossain/EclipseCreatedSOJavaFile/Blocks/";
 	static final String MacOSXPathToWriteFunctions = "/Users/manikhossain/EclipseCreatedSOJavaFile/Functions/";
-	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/Q_2018.csv";
-	static final String MacOSXPathLoggedErroticFile = "/Users/manikhossain/Q_NiCadLogs.csv";
+	static final String MacOSXPathToWriteUnWantedCode = "/Users/manikhossain/EclipseCreatedSOJavaFile/UnWantedCode/";
+	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/A_2018/";
+	static final String MacOSXPathFilteredErroticFile = "/Users/manikhossain/Q_NiCadLogs.csv";
 
 	static String[] codeTokensForFunctions = { "class", "package", "public", "private", "public static",
 			"private static", "public class", "private boolean", "public void", "private void", "import",
@@ -46,6 +47,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		//File file = new File(filename);
 		File directory1 = new File(MacOSXPathToWriteBlocks);
 		File directory2 = new File(MacOSXPathToWriteFunctions);
+		File directory3 = new File(MacOSXPathToWriteUnWantedCode);
 	
 		if (!directory1.exists()) {
 			directory1.mkdir();
@@ -53,7 +55,9 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		if (!directory2.exists()) {
 			directory2.mkdir();
 		}
-		
+		if (!directory3.exists()) {
+			directory3.mkdir();
+		}
 		
 		File[] files = new File(filename).listFiles();
 		//If this pathname does not denote a directory, then listFiles() returns null. 
@@ -61,6 +65,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		for (File singlefile : files) {
 		    if (singlefile.isFile()) {
 		    	getAllFilesFromCSVFolders(singlefile);
+		    	//NoOfFileExtracted = 1;
 		    }
 		}
 	}
@@ -229,16 +234,16 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		File file = new File(MacOSXFullPathToWrite);
 
 		file.delete();
-//		for (String removeUnwantedCode1 : removeUnwantedCode) {
-//			if (allCode.toString().contains(removeUnwantedCode1)) {
-//				isUnwanted = true;
-//				break;
-//			}
-//		}
+		for (String removeUnwantedCode1 : removeUnwantedCode) {
+			if (allCode.toString().contains(removeUnwantedCode1)) {
+				isUnwanted = true;
+				break;
+			}
+		}
 		
-//		if(allCode.startsWith("class")) {
-//			isUnwanted = true;
-//		}
+		if(allCode.startsWith("class")) {
+			isUnwanted = true;
+		}
 		
 //		if (!isBlocks && !isUnwanted) isUnwanted = IstheFileErrotic(fileName);
 		
@@ -266,7 +271,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 
 	private static boolean IstheFileErrotic(String fileName) throws FileNotFoundException {
 		boolean IstheFileErrotic = false;
-		File file = new File(MacOSXPathLoggedErroticFile);
+		File file = new File(MacOSXPathFilteredErroticFile);
 		Scanner sc2 = new Scanner(file);
 		while (sc2.hasNext()) {
 			String data = sc2.nextLine();
