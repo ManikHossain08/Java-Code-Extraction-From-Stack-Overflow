@@ -34,6 +34,9 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 			"SDK_INT", "using", "scala", "<script>", "html","ajax","console.log","RelativeLayout",
 			"</button>","</View>","<LinearLayout","<FrameLayout","</Form>","<Button","selector","undefined"
 			};
+	
+	//unexpected, using
+	
 	static String[] wantedCode = {"tableselection","+xml","editable","select *","SELECT *","Editable",
 			"java.lang.reflect","Hashtable"
 			
