@@ -15,23 +15,29 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static final String MacOSXPathToWriteBlocks = "/Users/manikhossain/EclipseCreatedSOJavaFile/Blocks/";
 	static final String MacOSXPathToWriteFunctions = "/Users/manikhossain/EclipseCreatedSOJavaFile/Functions/";
 	static final String MacOSXPathToWriteUnWantedCode = "/Users/manikhossain/EclipseCreatedSOJavaFile/UnWantedCode/";
-	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/A_2018/";
+	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/A_2008/";
 	static final String MacOSXPathFilteredErroticFile = "/Users/manikhossain/Q_NiCadLogs.csv";
 
 	static String[] codeTokensForFunctions = { "class", "package", "public", "private", "public static",
 			"private static", "public class", "private boolean", "public void", "private void", "import",
 			"public interface", "private interface", "abstract class", "public boolean", "void" };
 	static String[] codeReverseTokens = { "String.class" };
-	static String[] removeUnwantedCode = { "xml", "<application", "apply plugin", "compileSdkVersion", "<fileSets>",
+	static String[] removeUnwantedCode = { "<application", "apply plugin", "compileSdkVersion", "<fileSets>",
 			"<artifactId>", "<properties>", "pom.xml", "<plugins>", "using namespace std;", "<Switch", "</style>",
-			"org.junit", "Runtime Environment", "fatal error", "<dependency>", "<div>", "<bean", "<!--", "git repo",
+			"Runtime Environment", "fatal error", "<dependency>", "<div>", "<bean", "<!--", "git repo",
 			"</property>", "Caused by:", "FATAL EXCEPTION", "ComparisonFailure", "Unknown Source", "</mapping>",
-			"hibernate", "dependencies", "Unexpected", "unexpected", "No active", "ERROR", "</html>", "module",
-			"</option>", "docker", "vector", "version:", "src/main", "warning", "<?php", "</project>", "\"data\"",
-			"FAILS", "failed", "fails", "fatal", "xhtml", "404", "</div>", "<form:", "C#", "Button", "print",
-			"statusCode", "</activity>", "etc", "->", "java.lang", "select", "SELECT", "sql", "SQL", "</script>",
-			"<tr>", "<td>", "spring", "error", "TABLE", "table", "<TextView", "<servlet-mapping>", "jar",
-			"Breakpoint","<Label>","VERSION","SDK_INT","using","scala","<script>","html" };
+		    "dependencies", "Unexpected", "unexpected", "No active","</html>", "module",
+			"</option>", "docker", "vector", "version:", "src/main", "warning", "<?php", "</project>",
+		    "fatal", "xhtml", "404", "</div>", "<form:", "C#", "statusCode",
+			"</activity>","java.lang", "</script>", "<tr>", "<td>", "TABLE","<table>",
+			"<TextView", "<servlet-mapping>", "Breakpoint", "<Label>",
+			"SDK_INT", "using", "scala", "<script>", "html","ajax","console.log","RelativeLayout",
+			"</button>","</View>","<LinearLayout","<FrameLayout","</Form>","<Button","selector","undefined"
+			};
+	static String[] wantedCode = {"tableselection","+xml","editable","select *","SELECT *","Editable",
+			"java.lang.reflect","Hashtable"
+			
+	};
 
 	static String MacOSXFullPathToWrite = "";
 	static String CombineAllCode = "";
@@ -40,15 +46,18 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static String postIDAsFileName = "";
 	static String bodyOfCode = "";
 	static int NoOfFileExtracted = 0;
+	static int NoOfEroticFile = 0;
+	static int fromEachFile = 0;
+	static String fileLogYearly = "";
 
 	public static void main(String[] args) throws IOException {
 
 		String filename = MacOSXPathToReadFile;
-		//File file = new File(filename);
+		// File file = new File(filename);
 		File directory1 = new File(MacOSXPathToWriteBlocks);
 		File directory2 = new File(MacOSXPathToWriteFunctions);
 		File directory3 = new File(MacOSXPathToWriteUnWantedCode);
-	
+
 		if (!directory1.exists()) {
 			directory1.mkdir();
 		}
@@ -58,16 +67,35 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		if (!directory3.exists()) {
 			directory3.mkdir();
 		}
-		
+
 		File[] files = new File(filename).listFiles();
-		//If this pathname does not denote a directory, then listFiles() returns null. 
+		// If this pathname does not denote a directory, then listFiles() returns null.
 
 		for (File singlefile : files) {
-		    if (singlefile.isFile()) {
-		    	getAllFilesFromCSVFolders(singlefile);
-		    	//NoOfFileExtracted = 1;
-		    }
+			if (singlefile.isFile()) {
+				System.out.println("Started Reading from file: " + singlefile.getName());
+				getAllFilesFromCSVFolders(singlefile);
+				System.out.println("Ended Reading from file: " + singlefile.getName());
+			}
 		}
+
+		System.out.println("Code Extraction done succesfully. " + NoOfFileExtracted
+				+ " java files have been extracted from this csv file.");
+		System.out.println("UnWanted code Extraction done succesfully: " + NoOfEroticFile
+				+ " UnWanted codes/files have been extracted from this csv file.");
+		System.out.println(
+				"Total good code extraction after removing unwanted code: " + (NoOfFileExtracted - NoOfEroticFile));
+		fileLogYearly = "Code Extraction done succesfully. " + NoOfFileExtracted
+				+ " java files have been extracted from this csv file." + "UnWanted code Extraction done succesfully: "
+				+ NoOfEroticFile + " UnWanted codes/files have been extracted from this csv file."
+				+ "Total good code extraction after removing unwanted code: " + (NoOfFileExtracted - NoOfEroticFile);
+		
+		File file = new File("/Users/manikhossain/EclipseCreatedSOJavaFile/" + "fileLogYearly.txt");
+		file.createNewFile();
+		// Write Content
+		FileWriter writer = new FileWriter(file);
+		writer.write(fileLogYearly);
+		writer.close();
 	}
 
 	private static void getAllFilesFromCSVFolders(File file) throws IOException {
@@ -104,8 +132,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 
 			}
 			sc.close();
-			System.out.println("Code Extraction done succesfully. " + NoOfFileExtracted
-					+ " java files have been extracted from this csv file.");
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -121,7 +148,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		data = data.replace("....", "");
 		data = data.replace("..", "");
 		data = data.replace("&amp;&amp;", "&&");
-		data = data.replace("&amp;", "&"); 
+		data = data.replace("&amp;", "&");
 		data = data.replace("`", "");
 		if (data.contains("here") || data.strip().contentEquals(".") || data.startsWith(".")) {
 			isStartwithSlashAndContainsTokens = true;
@@ -131,7 +158,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 			if (data.split("//")[1].strip().contains("}")) {
 				data = data.replace("}", "//remove left bracket by manual conding");
 			}
-			if(data.split("//")[1].strip().contains("{")) {
+			if (data.split("//")[1].strip().contains("{")) {
 				data = data.replace("{", "//remove right bracket by manual conding");
 			}
 			String[] splitComments = data.split("//");
@@ -215,7 +242,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 					&& fileContent.charAt(fileContent.length() - 1) == '}') {
 				fileContent = fileContent.substring(0, fileContent.length() - 1);
 			} else if (countLeftBrackets > countRightBrackets) {
-				fileContent = fileContent + "\n"+ "}";
+				fileContent = fileContent + "\n" + "}";
 			}
 		}
 
@@ -224,33 +251,47 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 
 	private static void createJavaFileUsingFileClass(String fileName, String allCode) throws IOException {
 		boolean isUnwanted = false;
-		
+		String reasonOfUnwanted = "";
+
 		if (isBlocks) {
 			MacOSXFullPathToWrite = MacOSXPathToWriteBlocks + fileName + ".java";
 		} else {
 			MacOSXFullPathToWrite = MacOSXPathToWriteFunctions + fileName + ".java";
-			
-		}
-		File file = new File(MacOSXFullPathToWrite);
 
-		file.delete();
+		}
+
 		for (String removeUnwantedCode1 : removeUnwantedCode) {
 			if (allCode.toString().contains(removeUnwantedCode1)) {
 				isUnwanted = true;
+				reasonOfUnwanted = removeUnwantedCode1;
 				break;
 			}
 		}
-		
-		if(allCode.startsWith("class")) {
-			isUnwanted = true;
+		for (String wantedCode1 : wantedCode) {
+			if (allCode.toString().contains(wantedCode1)) {
+				isUnwanted = false;
+				break;
+			}
 		}
+
+//		if (allCode.startsWith("class")) {
+//			reasonOfUnwanted = "Code starts With class";
+//			isUnwanted = true;
+//		}
 		
 //		if (!isBlocks && !isUnwanted) isUnwanted = IstheFileErrotic(fileName);
-		
-		
+
+		if (isUnwanted) {
+			MacOSXFullPathToWrite = MacOSXPathToWriteUnWantedCode + fileName + ".java";
+			allCode = allCode + "\n" + "//" + reasonOfUnwanted;
+			NoOfEroticFile += 1;
+		}
+		File file = new File(MacOSXFullPathToWrite);
+		file.delete();
+
 		// Create the file if the code is only in java and not unwanted code
-		if (!isUnwanted) {
-			//if (!isBlocks)CleanMultipleclassInSameFile(allCode, fileName);
+		if (true) {
+			// if (!isBlocks)CleanMultipleclassInSameFile(allCode, fileName);
 			allCode = removeUnbalancedCurlyBrackets(allCode);
 			allCode = removeUnbalancedCurlyBrackets(allCode);
 			allCode = removeUnbalancedCurlyBrackets(allCode);
@@ -263,7 +304,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 			writer.write(allCode);
 			writer.close();
 			NoOfFileExtracted += 1;
-			//isBlocks = false;
+			// isBlocks = false;
 		}
 		isBlocks = false;
 
@@ -290,39 +331,38 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		if (!allCode.startsWith("package") && allCode.contains("package")) {
 			gurbageCode = allCode.split("package")[0].strip();
 			if (!gurbageCode.isEmpty()) {
-				if (!gurbageCode.contains("package") && !gurbageCode.contains("import") 
-						&& !gurbageCode.startsWith("@")) { 
+				if (!gurbageCode.contains("package") && !gurbageCode.contains("import")
+						&& !gurbageCode.startsWith("@")) {
 					allCode = allCode.replace(gurbageCode, "");
 					System.out.println("public class: " + fileName);
 					System.out.println("gurbageCode: " + gurbageCode);
 					gurbageCode = "";
 				}
 			}
-		}
-		else if (!allCode.startsWith("package") && allCode.contains("package")) {
+		} else if (!allCode.startsWith("package") && allCode.contains("package")) {
 			gurbageCode = allCode.split("import")[0].strip();
 			if (!gurbageCode.isEmpty()) {
-				if (!gurbageCode.contains("package") && !gurbageCode.contains("import") 
-						&& !gurbageCode.startsWith("@")) { 
+				if (!gurbageCode.contains("package") && !gurbageCode.contains("import")
+						&& !gurbageCode.startsWith("@")) {
 					allCode = allCode.replace(gurbageCode, "");
 					System.out.println("public class: " + fileName);
 					System.out.println("gurbageCode: " + gurbageCode);
 					gurbageCode = "";
 				}
 			}
-		}else if(!allCode.startsWith("public class") && allCode.contains("public class")) {
-			
+		} else if (!allCode.startsWith("public class") && allCode.contains("public class")) {
+
 			gurbageCode = allCode.split("public class")[0].strip();
 			if (!gurbageCode.isEmpty()) {
-				if (!gurbageCode.contains("package") && !gurbageCode.contains("import") 
-						&& !gurbageCode.startsWith("@")) { 
+				if (!gurbageCode.contains("package") && !gurbageCode.contains("import")
+						&& !gurbageCode.startsWith("@")) {
 					allCode = allCode.replace(gurbageCode, "");
 					System.out.println("public class: " + fileName);
 					System.out.println("gurbageCode: " + gurbageCode);
 					gurbageCode = "";
 				}
 			}
-			
+
 		}
 		return allCode;
 	}
