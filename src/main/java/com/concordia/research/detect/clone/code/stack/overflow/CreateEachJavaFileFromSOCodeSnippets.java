@@ -15,7 +15,7 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static final String MacOSXPathToWriteBlocks = "/Users/manikhossain/EclipseCreatedSOJavaFile/Blocks/";
 	static final String MacOSXPathToWriteFunctions = "/Users/manikhossain/EclipseCreatedSOJavaFile/Functions/";
 	static final String MacOSXPathToWriteUnWantedCode = "/Users/manikhossain/EclipseCreatedSOJavaFile/UnWantedCode/";
-	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/A_2008/";
+	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/Acpt2008/";
 	static final String MacOSXPathFilteredErroticFile = "/Users/manikhossain/Q_NiCadLogs.csv";
 
 	static String[] codeTokensForFunctions = { "class", "package", "public", "private", "public static",
@@ -24,22 +24,20 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static String[] codeReverseTokens = { "String.class" };
 	static String[] removeUnwantedCode = { "<application", "apply plugin", "compileSdkVersion", "<fileSets>",
 			"<artifactId>", "<properties>", "pom.xml", "<plugins>", "using namespace std;", "<Switch", "</style>",
-			"Runtime Environment", "fatal error", "<dependency>", "<div>", "<bean", "<!--", "git repo",
-			"</property>", "Caused by:", "FATAL EXCEPTION", "ComparisonFailure", "Unknown Source", "</mapping>",
-		    "dependencies", "Unexpected", "unexpected", "No active","</html>", "module",
-			"</option>", "docker", "vector", "version:", "src/main", "warning", "<?php", "</project>",
-		    "fatal", "xhtml", "404", "</div>", "<form:", "C#", "statusCode",
-			"</activity>","java.lang", "</script>", "<tr>", "<td>", "TABLE","<table>",
-			"<TextView", "<servlet-mapping>", "Breakpoint", "<Label>",
-			"SDK_INT", "using", "scala", "<script>", "html","ajax","console.log","RelativeLayout",
-			"</button>","</View>","<LinearLayout","<FrameLayout","</Form>","<Button","selector","undefined"
-			};
-	
-	//unexpected, using
-	
-	static String[] wantedCode = {"tableselection","+xml","editable","select *","SELECT *","Editable",
-			"java.lang.reflect","Hashtable"
-			
+			"Runtime Environment", "fatal error", "<dependency>", "<div>", "<bean", "<!--", "git repo", "</property>",
+			"Caused by:", "FATAL EXCEPTION", "ComparisonFailure", "Unknown Source", "</mapping>", "dependencies",
+			"Unexpected", "unexpected", "No active", "</html>", "module", "</option>", "docker", "vector", "version:",
+			"src/main", "warning", "<?php", "</project>", "fatal", "xhtml", "404", "</div>", "<form:", "C#",
+			"statusCode", "</activity>", "java.lang", "</script>", "<tr>", "<td>", "TABLE", "<table>", "<TextView",
+			"<servlet-mapping>", "Breakpoint", "<Label>", "SDK_INT", "using", "scala", "<script>", "html", "ajax",
+			"console.log", "RelativeLayout", "</button>", "</View>", "<LinearLayout", "<FrameLayout", "</Form>",
+			"<Button", "selector", "undefined" };
+
+	// unexpected, using
+
+	static String[] wantedCode = { "tableselection", "+xml", "editable", "select *", "SELECT *", "Editable",
+			"java.lang.reflect", "Hashtable"
+
 	};
 
 	static String MacOSXFullPathToWrite = "";
@@ -51,15 +49,21 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static int NoOfFileExtracted = 0;
 	static int NoOfEroticFile = 0;
 	static int fromEachFile = 0;
+	static int smallCOde = 0;
+	static int totalCode = 0;
 	static String fileLogYearly = "";
+	static String CSVbuilder = null;
+	
 
 	public static void main(String[] args) throws IOException {
 
 		String filename = MacOSXPathToReadFile;
+		FileWriter csvWriter = new FileWriter("/Users/manikhossain/LeftAnswers2008.csv");
 		// File file = new File(filename);
 		File directory1 = new File(MacOSXPathToWriteBlocks);
 		File directory2 = new File(MacOSXPathToWriteFunctions);
 		File directory3 = new File(MacOSXPathToWriteUnWantedCode);
+		
 
 		if (!directory1.exists()) {
 			directory1.mkdir();
@@ -77,11 +81,11 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		for (File singlefile : files) {
 			if (singlefile.isFile()) {
 				System.out.println("Started Reading from file: " + singlefile.getName());
-				getAllFilesFromCSVFolders(singlefile);
+				getAllFilesFromCSVFolders(singlefile, csvWriter);
 				System.out.println("Ended Reading from file: " + singlefile.getName());
 			}
 		}
-
+		csvWriter.close();
 		System.out.println("Code Extraction done succesfully. " + NoOfFileExtracted
 				+ " java files have been extracted from this csv file.");
 		System.out.println("UnWanted code Extraction done succesfully: " + NoOfEroticFile
@@ -91,17 +95,23 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		fileLogYearly = "Code Extraction done succesfully. " + NoOfFileExtracted
 				+ " java files have been extracted from this csv file." + "UnWanted code Extraction done succesfully: "
 				+ NoOfEroticFile + " UnWanted codes/files have been extracted from this csv file."
-				+ "Total good code extraction after removing unwanted code: " + (NoOfFileExtracted - NoOfEroticFile);
-		
+				+ "Total good code extraction after removing unwanted code: " + (NoOfFileExtracted - NoOfEroticFile)
+				+ "Number of small code: " + smallCOde + "\n" + "Number of total code: " + totalCode;
+
+		System.out.println("Number of small code: " + smallCOde);
+
+		System.out.println("Number of total code: " + totalCode);
+
 		File file = new File("/Users/manikhossain/EclipseCreatedSOJavaFile/" + "fileLogYearly.txt");
 		file.createNewFile();
 		// Write Content
 		FileWriter writer = new FileWriter(file);
 		writer.write(fileLogYearly);
 		writer.close();
+		
 	}
 
-	private static void getAllFilesFromCSVFolders(File file) throws IOException {
+	private static void getAllFilesFromCSVFolders(File file, FileWriter csvWriter) throws IOException {
 		try {
 			Scanner sc = new Scanner(file);
 			while (sc.hasNext()) {
@@ -114,16 +124,15 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 							postIDAsFileName = data.split("<postid>")[0];
 							bodyOfCode = data.split("<postid>")[1];
 						} else {
-							postIDAsFileName = "FoundProblemInData";
-							bodyOfCode = "FoundProblemInData";
-							continue;
+							bodyOfCode = data;
+							// continue;
 						}
 						if (!isStartwithSlashAndContainsTokens) {
 							// add only code not comments with tokens till end
 							CombineAllCode = CombineAllCode + bodyOfCode;
 						}
 					} else if (data.contentEquals("\"")) { // indicate last line of each row value
-						extractHtmlCodeTags(postIDAsFileName, CombineAllCode);
+						extractHtmlCodeTags(postIDAsFileName, CombineAllCode, csvWriter);
 						CombineAllCode = "";
 					} else {
 						if (!isStartwithSlashAndContainsTokens) {
@@ -180,8 +189,9 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	}
 
 	// extract only code portion from whole HTML code using split function.
-	private static void extractHtmlCodeTags(String fileName, String stringToSearch) throws IOException {
+	private static void extractHtmlCodeTags(String fileName, String stringToSearch, FileWriter csvWriter) throws IOException {
 		int counter = 1;
+		int flag = 3;
 		String[] splitCOde = stringToSearch.split("<code>");
 		for (String partByPartCode : splitCOde) {
 			String[] departedCode = partByPartCode.split("</code>");
@@ -190,10 +200,19 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 				int noOfWords = countWordsUsingStringTokenizer(departedCode[0]);
 				try {
 					if (noOfWords > 3 && noOfLines > 9) {
+						smallCOde = smallCOde + 1;
 						String contentOfFile = codeWrangglingFunctionORBlocks(departedCode[0], 1);
 						createJavaFileUsingFileClass(fileName + "_" + Integer.toString(counter), contentOfFile);
+						flag = 1;
 						counter += 1;
+					} else { 
+						smallCOde = smallCOde + 1;
+						flag = 0;
 					}
+					CSVbuilder = fileName + "," + counter+","+ flag ;
+					csvWriter.write("\n");
+					csvWriter.write(CSVbuilder);
+					totalCode += 1;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -263,27 +282,6 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 
 		}
 
-		for (String removeUnwantedCode1 : removeUnwantedCode) {
-			if (allCode.toString().contains(removeUnwantedCode1)) {
-				isUnwanted = true;
-				reasonOfUnwanted = removeUnwantedCode1;
-				break;
-			}
-		}
-		for (String wantedCode1 : wantedCode) {
-			if (allCode.toString().contains(wantedCode1)) {
-				isUnwanted = false;
-				break;
-			}
-		}
-
-//		if (allCode.startsWith("class")) {
-//			reasonOfUnwanted = "Code starts With class";
-//			isUnwanted = true;
-//		}
-		
-//		if (!isBlocks && !isUnwanted) isUnwanted = IstheFileErrotic(fileName);
-
 		if (isUnwanted) {
 			MacOSXFullPathToWrite = MacOSXPathToWriteUnWantedCode + fileName + ".java";
 			allCode = allCode + "\n" + "//" + reasonOfUnwanted;
@@ -295,19 +293,18 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		// Create the file if the code is only in java and not unwanted code
 		if (true) {
 			// if (!isBlocks)CleanMultipleclassInSameFile(allCode, fileName);
-			allCode = removeUnbalancedCurlyBrackets(allCode);
-			allCode = removeUnbalancedCurlyBrackets(allCode);
-			allCode = removeUnbalancedCurlyBrackets(allCode);
-			allCode = removeUnbalancedCurlyBrackets(allCode);
-			allCode = removeUnbalancedCurlyBrackets(allCode);
+//			allCode = removeUnbalancedCurlyBrackets(allCode);
+//			allCode = removeUnbalancedCurlyBrackets(allCode);
+//			allCode = removeUnbalancedCurlyBrackets(allCode);
+//			allCode = removeUnbalancedCurlyBrackets(allCode);
+//			allCode = removeUnbalancedCurlyBrackets(allCode);
 
-			file.createNewFile();
-			// Write Content
-			FileWriter writer = new FileWriter(file);
-			writer.write(allCode);
-			writer.close();
+//			file.createNewFile();
+//			FileWriter writer = new FileWriter(file);
+//			writer.write(allCode);
+//			writer.close();
 			NoOfFileExtracted += 1;
-			// isBlocks = false;
+
 		}
 		isBlocks = false;
 
