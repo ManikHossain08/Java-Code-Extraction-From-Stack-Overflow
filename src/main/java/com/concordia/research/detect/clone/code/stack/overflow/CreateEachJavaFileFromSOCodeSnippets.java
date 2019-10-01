@@ -15,7 +15,6 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static final String MacOSXPathToWriteBlocks = "/Users/manikhossain/EclipseCreatedSOJavaFile/Blocks/";
 	static final String MacOSXPathToWriteFunctions = "/Users/manikhossain/EclipseCreatedSOJavaFile/Functions/";
 	static final String MacOSXPathToWriteUnWantedCode = "/Users/manikhossain/EclipseCreatedSOJavaFile/UnWantedCode/";
-	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/Acpt2008/";
 	static final String MacOSXPathFilteredErroticFile = "/Users/manikhossain/Q_NiCadLogs.csv";
 
 	static String[] codeTokensForFunctions = { "class", "package", "public", "private", "public static",
@@ -50,20 +49,35 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static int NoOfEroticFile = 0;
 	static int fromEachFile = 0;
 	static int smallCOde = 0;
+	static int GoodCode = 0;
 	static int totalCode = 0;
+	static int totalQA = 1;
+	static int totalGoodQA = 0;
+	static int totalLeftQA = 0;
 	static String fileLogYearly = "";
 	static String CSVbuilder = null;
-	
+	static String CSVbuildergood = null;
+	static String CSVbuildergood_2 = null;
+	static String CSVbuildergood_3 = null;
+	static String CSVbuilder_2 = null;
+	static String CSVbuilder_3 = null;
+	static String CSVbuilder_4 = null;
+	static final String MacOSXPathToReadFile = "/Users/manikhossain/EclipseCreatedSOJavaFile/Acpt2018/";
 
 	public static void main(String[] args) throws IOException {
 
 		String filename = MacOSXPathToReadFile;
-		FileWriter csvWriter = new FileWriter("/Users/manikhossain/LeftAnswers2008.csv");
+		FileWriter csvWriterLeft = new FileWriter("/Users/manikhossain/LeftQuestions2008.csv");
+		FileWriter csvWriterLeft_2 = new FileWriter("/Users/manikhossain/LeftQuestions2008_2.csv");
+		FileWriter csvWriterLeft_3 = new FileWriter("/Users/manikhossain/LeftQuestions2008_3.csv");
+		FileWriter csvWriterLeft_4 = new FileWriter("/Users/manikhossain/LeftQuestions2008_4.csv");
+		FileWriter csvWriterGood = new FileWriter("/Users/manikhossain/GoodQuestions2008.csv");
+		FileWriter csvWriterGood_2 = new FileWriter("/Users/manikhossain/GoodQuestions2008_2.csv");
+		FileWriter csvWriterGood_3 = new FileWriter("/Users/manikhossain/GoodQuestions2008_3.csv");
 		// File file = new File(filename);
 		File directory1 = new File(MacOSXPathToWriteBlocks);
 		File directory2 = new File(MacOSXPathToWriteFunctions);
 		File directory3 = new File(MacOSXPathToWriteUnWantedCode);
-		
 
 		if (!directory1.exists()) {
 			directory1.mkdir();
@@ -81,11 +95,18 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		for (File singlefile : files) {
 			if (singlefile.isFile()) {
 				System.out.println("Started Reading from file: " + singlefile.getName());
-				getAllFilesFromCSVFolders(singlefile, csvWriter);
+				getAllFilesFromCSVFolders(singlefile, csvWriterLeft, csvWriterGood, csvWriterGood_2, csvWriterGood_3,
+						csvWriterLeft_2, csvWriterLeft_3, csvWriterLeft_4);
 				System.out.println("Ended Reading from file: " + singlefile.getName());
 			}
 		}
-		csvWriter.close();
+		csvWriterLeft.close();
+		csvWriterGood.close();
+		csvWriterGood_2.close();
+		csvWriterGood_3.close();
+		csvWriterLeft_2.close();
+		csvWriterLeft_3.close();
+		csvWriterLeft_4.close();
 		System.out.println("Code Extraction done succesfully. " + NoOfFileExtracted
 				+ " java files have been extracted from this csv file.");
 		System.out.println("UnWanted code Extraction done succesfully: " + NoOfEroticFile
@@ -101,6 +122,12 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		System.out.println("Number of small code: " + smallCOde);
 
 		System.out.println("Number of total code: " + totalCode);
+		System.out.println("Number of total Good Code: " + GoodCode);
+		//System.out.println("Number of total Q or A: " + totalQA); 
+		
+
+		//System.out.println("Number of total LeftQA: " + totalLeftQA);
+		//System.out.println("Number of total Good QA: " + totalGoodQA);
 
 		File file = new File("/Users/manikhossain/EclipseCreatedSOJavaFile/" + "fileLogYearly.txt");
 		file.createNewFile();
@@ -108,10 +135,12 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 		FileWriter writer = new FileWriter(file);
 		writer.write(fileLogYearly);
 		writer.close();
-		
+
 	}
 
-	private static void getAllFilesFromCSVFolders(File file, FileWriter csvWriter) throws IOException {
+	private static void getAllFilesFromCSVFolders(File file, FileWriter csvWriterLeft, FileWriter csvWriterGood,
+			FileWriter csvWriterGood_2, FileWriter csvWriterGood_3, FileWriter csvWriterLeft_2,
+			FileWriter csvWriterLeft_3, FileWriter csvWriterLeft_4) throws IOException {
 		try {
 			Scanner sc = new Scanner(file);
 			while (sc.hasNext()) {
@@ -131,8 +160,10 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 							// add only code not comments with tokens till end
 							CombineAllCode = CombineAllCode + bodyOfCode;
 						}
-					} else if (data.contentEquals("\"")) { // indicate last line of each row value
-						extractHtmlCodeTags(postIDAsFileName, CombineAllCode, csvWriter);
+					} else if (data.contentEquals("\"")) { // indicate last line of each row value that means each
+															// questions or answers
+						extractHtmlCodeTags(postIDAsFileName, CombineAllCode, csvWriterLeft, csvWriterGood,
+								csvWriterGood_2, csvWriterGood_3, csvWriterLeft_2, csvWriterLeft_3, csvWriterLeft_4);
 						CombineAllCode = "";
 					} else {
 						if (!isStartwithSlashAndContainsTokens) {
@@ -189,9 +220,12 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	}
 
 	// extract only code portion from whole HTML code using split function.
-	private static void extractHtmlCodeTags(String fileName, String stringToSearch, FileWriter csvWriter) throws IOException {
+	private static void extractHtmlCodeTags(String fileName, String stringToSearch, FileWriter csvWriterLeft,
+			FileWriter csvWriterGood, FileWriter csvWriterGood_2, FileWriter csvWriterGood_3,
+			FileWriter csvWriterLeft_2, FileWriter csvWriterLeft_3, FileWriter csvWriterLeft_4) throws IOException {
 		int counter = 1;
-		int flag = 3;
+		// boolean isAnswerUsed = false;
+		totalQA += 1;
 		String[] splitCOde = stringToSearch.split("<code>");
 		for (String partByPartCode : splitCOde) {
 			String[] departedCode = partByPartCode.split("</code>");
@@ -200,25 +234,61 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 				int noOfWords = countWordsUsingStringTokenizer(departedCode[0]);
 				try {
 					if (noOfWords > 3 && noOfLines > 9) {
-						smallCOde = smallCOde + 1;
 						String contentOfFile = codeWrangglingFunctionORBlocks(departedCode[0], 1);
 						createJavaFileUsingFileClass(fileName + "_" + Integer.toString(counter), contentOfFile);
-						flag = 1;
+						// isAnswerUsed = true;
 						counter += 1;
-					} else { 
+						GoodCode = GoodCode + 1;
+						// break;
+					} else {
 						smallCOde = smallCOde + 1;
-						flag = 0;
+						// isAnswerUsed = false;
 					}
-					CSVbuilder = fileName + "," + counter+","+ flag ;
-					csvWriter.write("\n");
-					csvWriter.write(CSVbuilder);
+
 					totalCode += 1;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-
+//		if (!isAnswerUsed) {
+//			if (totalLeftQA < 65534) {
+//				CSVbuilder = fileName + "," + counter;
+//				csvWriterLeft.write("\n");
+//				csvWriterLeft.write(CSVbuilder);
+//			} else if (totalLeftQA >= 65534 && totalLeftQA < 131068) {
+//				CSVbuilder_2 = fileName + "," + counter;
+//				csvWriterLeft_2.write("\n");
+//				csvWriterLeft_2.write(CSVbuilder_2);
+//			} else if (totalLeftQA >= 131068 && totalLeftQA < 196604) {
+//				CSVbuilder_3 = fileName + "," + counter;
+//				csvWriterLeft_3.write("\n");
+//				csvWriterLeft_3.write(CSVbuilder_3);
+//			} else if (totalLeftQA >= 196604 && totalLeftQA < 262138) {
+//				CSVbuilder_4 = fileName + "," + counter;
+//				csvWriterLeft_4.write("\n");
+//				csvWriterLeft_4.write(CSVbuilder_4);
+//			}
+//			totalLeftQA += 1;
+//		}
+//		if (isAnswerUsed) {
+//		
+//			if (totalGoodQA < 65534) {
+//				CSVbuildergood = fileName + "," + counter;
+//				csvWriterGood.write("\n");
+//				csvWriterGood.write(CSVbuildergood);
+//			} else if (totalGoodQA >= 65534 && totalGoodQA < 131068) {
+//				CSVbuildergood_2 = fileName + "," + counter;
+//				csvWriterGood_2.write("\n");
+//				csvWriterGood_2.write(CSVbuildergood_2);
+//			} else if (totalGoodQA >= 131068 && totalGoodQA < 196604) {
+//				CSVbuildergood_3 = fileName + "," + counter;
+//				csvWriterGood_3.write("\n");
+//				csvWriterGood_3.write(CSVbuildergood_3);
+//			}
+//			
+//			totalGoodQA += 1;
+//		}
 	}
 
 	/*
