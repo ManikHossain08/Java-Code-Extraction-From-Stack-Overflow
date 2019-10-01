@@ -54,6 +54,8 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	static int totalQA = 1;
 	static int totalGoodQA = 0;
 	static int totalLeftQA = 0;
+	static int totalBlockNo = 0;
+	static int totalFunctions = 0;
 	static String fileLogYearly = "";
 	static String CSVbuilder = null;
 	static String CSVbuildergood = null;
@@ -67,13 +69,13 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 	public static void main(String[] args) throws IOException {
 
 		String filename = MacOSXPathToReadFile;
-		FileWriter csvWriterLeft = new FileWriter("/Users/manikhossain/LeftQuestions2008.csv");
-		FileWriter csvWriterLeft_2 = new FileWriter("/Users/manikhossain/LeftQuestions2008_2.csv");
-		FileWriter csvWriterLeft_3 = new FileWriter("/Users/manikhossain/LeftQuestions2008_3.csv");
-		FileWriter csvWriterLeft_4 = new FileWriter("/Users/manikhossain/LeftQuestions2008_4.csv");
-		FileWriter csvWriterGood = new FileWriter("/Users/manikhossain/GoodQuestions2008.csv");
-		FileWriter csvWriterGood_2 = new FileWriter("/Users/manikhossain/GoodQuestions2008_2.csv");
-		FileWriter csvWriterGood_3 = new FileWriter("/Users/manikhossain/GoodQuestions2008_3.csv");
+		FileWriter csvWriterLeft = new FileWriter("/Users/manikhossain/LeftQuestions2018.csv");
+		FileWriter csvWriterLeft_2 = new FileWriter("/Users/manikhossain/LeftQuestions2018_2.csv");
+		FileWriter csvWriterLeft_3 = new FileWriter("/Users/manikhossain/LeftQuestions2018_3.csv");
+		FileWriter csvWriterLeft_4 = new FileWriter("/Users/manikhossain/LeftQuestions2018_4.csv");
+		FileWriter csvWriterGood = new FileWriter("/Users/manikhossain/GoodQuestions2018.csv");
+		FileWriter csvWriterGood_2 = new FileWriter("/Users/manikhossain/GoodQuestions2018_2.csv");
+		FileWriter csvWriterGood_3 = new FileWriter("/Users/manikhossain/GoodQuestions2018_3.csv");
 		// File file = new File(filename);
 		File directory1 = new File(MacOSXPathToWriteBlocks);
 		File directory2 = new File(MacOSXPathToWriteFunctions);
@@ -123,9 +125,11 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 
 		System.out.println("Number of total code: " + totalCode);
 		System.out.println("Number of total Good Code: " + GoodCode);
-		//System.out.println("Number of total Q or A: " + totalQA); 
 		
-
+		System.out.println("Number of total Blocks: " + totalBlockNo);
+		System.out.println("Number of total Functions: " + totalFunctions);
+		
+		//System.out.println("Number of total Q or A: " + totalQA); 
 		//System.out.println("Number of total LeftQA: " + totalLeftQA);
 		//System.out.println("Number of total Good QA: " + totalGoodQA);
 
@@ -224,7 +228,9 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 			FileWriter csvWriterGood, FileWriter csvWriterGood_2, FileWriter csvWriterGood_3,
 			FileWriter csvWriterLeft_2, FileWriter csvWriterLeft_3, FileWriter csvWriterLeft_4) throws IOException {
 		int counter = 1;
-		// boolean isAnswerUsed = false;
+	    //boolean isAnswerUsed = false;
+	    boolean isfunctionUsed = false;
+	    boolean isBlocksUsed = false;
 		totalQA += 1;
 		String[] splitCOde = stringToSearch.split("<code>");
 		for (String partByPartCode : splitCOde) {
@@ -235,6 +241,16 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 				try {
 					if (noOfWords > 3 && noOfLines > 9) {
 						String contentOfFile = codeWrangglingFunctionORBlocks(departedCode[0], 1);
+						//-----
+						if(isBlocks) {
+							isBlocksUsed = true;
+							totalBlockNo+=1;
+						}
+						else {
+							isfunctionUsed = true;
+							totalFunctions +=1;
+						}
+						//-------
 						createJavaFileUsingFileClass(fileName + "_" + Integer.toString(counter), contentOfFile);
 						// isAnswerUsed = true;
 						counter += 1;
@@ -244,51 +260,56 @@ public class CreateEachJavaFileFromSOCodeSnippets {
 						smallCOde = smallCOde + 1;
 						// isAnswerUsed = false;
 					}
-
+					
+					
+					if (isfunctionUsed) {
+						if (totalLeftQA < 65534) {
+							CSVbuilder = fileName + "," + counter;
+							csvWriterLeft.write("\n");
+							csvWriterLeft.write(CSVbuilder);
+						} else if (totalLeftQA >= 65534 && totalLeftQA < 131068) {
+							CSVbuilder_2 = fileName + "," + counter;
+							csvWriterLeft_2.write("\n");
+							csvWriterLeft_2.write(CSVbuilder_2);
+						} else if (totalLeftQA >= 131068 && totalLeftQA < 196604) {
+							CSVbuilder_3 = fileName + "," + counter;
+							csvWriterLeft_3.write("\n");
+							csvWriterLeft_3.write(CSVbuilder_3);
+						} else if (totalLeftQA >= 196604 && totalLeftQA < 262138) {
+							CSVbuilder_4 = fileName + "," + counter;
+							csvWriterLeft_4.write("\n");
+							csvWriterLeft_4.write(CSVbuilder_4);
+						}
+						totalLeftQA += 1;
+					}
+					if (isBlocksUsed) {
+					
+						if (totalGoodQA < 65534) {
+							CSVbuildergood = fileName + "," + counter;
+							csvWriterGood.write("\n");
+							csvWriterGood.write(CSVbuildergood);
+						} else if (totalGoodQA >= 65534 && totalGoodQA < 131068) {
+							CSVbuildergood_2 = fileName + "," + counter;
+							csvWriterGood_2.write("\n");
+							csvWriterGood_2.write(CSVbuildergood_2);
+						} else if (totalGoodQA >= 131068 && totalGoodQA < 196604) {
+							CSVbuildergood_3 = fileName + "," + counter;
+							csvWriterGood_3.write("\n");
+							csvWriterGood_3.write(CSVbuildergood_3);
+						}
+						
+						totalGoodQA += 1;
+					}
+					
+					 isfunctionUsed = false;
+				     isBlocksUsed = false;
 					totalCode += 1;
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		}
-//		if (!isAnswerUsed) {
-//			if (totalLeftQA < 65534) {
-//				CSVbuilder = fileName + "," + counter;
-//				csvWriterLeft.write("\n");
-//				csvWriterLeft.write(CSVbuilder);
-//			} else if (totalLeftQA >= 65534 && totalLeftQA < 131068) {
-//				CSVbuilder_2 = fileName + "," + counter;
-//				csvWriterLeft_2.write("\n");
-//				csvWriterLeft_2.write(CSVbuilder_2);
-//			} else if (totalLeftQA >= 131068 && totalLeftQA < 196604) {
-//				CSVbuilder_3 = fileName + "," + counter;
-//				csvWriterLeft_3.write("\n");
-//				csvWriterLeft_3.write(CSVbuilder_3);
-//			} else if (totalLeftQA >= 196604 && totalLeftQA < 262138) {
-//				CSVbuilder_4 = fileName + "," + counter;
-//				csvWriterLeft_4.write("\n");
-//				csvWriterLeft_4.write(CSVbuilder_4);
-//			}
-//			totalLeftQA += 1;
-//		}
-//		if (isAnswerUsed) {
-//		
-//			if (totalGoodQA < 65534) {
-//				CSVbuildergood = fileName + "," + counter;
-//				csvWriterGood.write("\n");
-//				csvWriterGood.write(CSVbuildergood);
-//			} else if (totalGoodQA >= 65534 && totalGoodQA < 131068) {
-//				CSVbuildergood_2 = fileName + "," + counter;
-//				csvWriterGood_2.write("\n");
-//				csvWriterGood_2.write(CSVbuildergood_2);
-//			} else if (totalGoodQA >= 131068 && totalGoodQA < 196604) {
-//				CSVbuildergood_3 = fileName + "," + counter;
-//				csvWriterGood_3.write("\n");
-//				csvWriterGood_3.write(CSVbuildergood_3);
-//			}
-//			
-//			totalGoodQA += 1;
-//		}
+
 	}
 
 	/*
